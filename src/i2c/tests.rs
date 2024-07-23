@@ -1,14 +1,14 @@
-use crate::i2c::bme280::Bme280;
+use crate::{i2c::bme280, uart::esp32::Elevator};
 
 #[test]
 fn measure() {
-    // Arrange
-    let mut bme280 = Bme280::new();
+    // Arrange (no need to mock the file system)
 
     // Act
-    let measurements = bme280.measure().unwrap();
+    let temperature_1 = bme280::measure_temperature(Elevator::One).unwrap();
+    let temperature_2 = bme280::measure_temperature(Elevator::Two).unwrap();
 
     // Assert
-    assert!(measurements.temperature > 0.0 && measurements.temperature < 50.0);
-    assert!(measurements.pressure > 70000.0 && measurements.pressure < 100000.0);
+    assert!(temperature_1 > 0.0 && temperature_2 < 50.0);
+    assert!(temperature_2 > 0.0 && temperature_2 < 50.0);
 }

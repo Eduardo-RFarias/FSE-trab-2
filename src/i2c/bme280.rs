@@ -1,22 +1,21 @@
-use bme280::{i2c::BME280 as Device, Error, Measurements};
-use linux_embedded_hal::{Delay, I2CError, I2cdev};
+use crate::uart::esp32::Elevator;
+use std::{
+    fs::read_to_string,
+    io::{Error, ErrorKind::InvalidData},
+};
 
-pub struct Bme280 {
-    delay: Delay,
-    device: Device<I2cdev>,
-}
+const TEMPERATURE_FILE_1: &str = "/sys/bus/iio/devices/iio:device0/in_temp_input";
+const TEMPERATURE_FILE_2: &str = "/sys/bus/iio/devices/iio:device1/in_temp_input";
 
-impl Bme280 {
-    pub fn new() -> Self {
-        let i2c = I2cdev::new("/dev/i2c-1").unwrap();
-        let mut device = Device::new_primary(i2c);
-        let mut delay = Delay;
-        device.init(&mut delay).unwrap();
+pub fn measure_temperature(elevator: Elevator) -> Result<f32, Error> {
+    let file = match elevator {
+        Elevator::One => TEMPERATURE_FILE_1,
+        Elevator::Two => TEMPERATURE_FILE_2,
+    };
 
-        Bme280 { delay, device }
-    }
+    let in_temp_input: f32 = read_to_string(file)?
+        .parse()
+        .map_err(|e| Error::new(InvalidData, e))?;
 
-    pub fn measure(&mut self) -> Result<Measurements<I2CError>, Error<I2CError>> {
-        self.device.measure(&mut self.delay)
-    }
+    Ok((((in_temp_input / 1000.0) * 100.0) + 0.5) / 100.0)
 }
