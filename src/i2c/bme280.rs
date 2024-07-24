@@ -4,8 +4,8 @@ use std::{
     io::{Error, ErrorKind::InvalidData},
 };
 
-const TEMPERATURE_FILE_1: &str = "/sys/bus/iio/devices/iio:device0/in_temp_input";
-const TEMPERATURE_FILE_2: &str = "/sys/bus/iio/devices/iio:device1/in_temp_input";
+const TEMPERATURE_FILE_1: &str = "/sys/bus/i2c/devices/i2c-1/1-0076/iio:device0/in_temp_input";
+const TEMPERATURE_FILE_2: &str = "/sys/bus/i2c/devices/i2c-1/1-0077/iio:device1/in_temp_input";
 
 pub fn measure_temperature(elevator: Elevator) -> Result<f32, Error> {
     let file = match elevator {
@@ -14,6 +14,7 @@ pub fn measure_temperature(elevator: Elevator) -> Result<f32, Error> {
     };
 
     let in_temp_input: f32 = read_to_string(file)?
+        .trim()
         .parse()
         .map_err(|e| Error::new(InvalidData, e))?;
 
