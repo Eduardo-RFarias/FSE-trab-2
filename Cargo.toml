@@ -6,4 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rppal = "0.18.0"
+bme280 = "0.5.1"
+embedded-graphics = "0.8.1"
+rppal = { version = "0.18.0", features = ["hal"] }
+ssd1306 = "0.8.4"

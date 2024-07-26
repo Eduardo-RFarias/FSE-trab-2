@@ -1,15 +1,9 @@
+use crate::common::Elevator;
 use crate::uart::modbus::{
     create_modbus, read_modbus, READ_ENCODER, READ_REGISTERS, SEND_PWM, SEND_TEMP, WRITE_REGISTERS,
 };
-use rppal::uart::{Parity, Queue, Uart as UartDevice};
+use rppal::uart::{Parity, Queue, Uart};
 use std::{collections::HashMap, thread::sleep, time::Duration};
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[repr(u8)]
-pub enum Elevator {
-    One = 0x00,
-    Two = 0x01,
-}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -80,12 +74,15 @@ impl From<u8> for Button {
 }
 
 pub struct Esp32 {
-    uart: UartDevice,
+    uart: Uart,
 }
 
 impl Esp32 {
     pub fn new() -> Self {
-        let uart = UartDevice::new(115200, Parity::None, 8, 1).unwrap();
+        let uart = Uart::new(115200, Parity::None, 8, 1).unwrap();
+
+        println!("ESP32 initialized in UART mode");
+
         Esp32 { uart }
     }
 
