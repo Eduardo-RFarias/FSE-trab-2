@@ -114,8 +114,6 @@ impl ElevatorControl {
         }
 
         self.start_temperature_control();
-
-        println!("Elevator control initialized");
     }
 
     pub fn move_to(&mut self, elevator: Elevator, floor: Floor) {
@@ -256,7 +254,7 @@ impl ElevatorControl {
 
         self.calibrated = true;
 
-        println!("Elevator calibration finished. Results:");
+        println!("Elevator calibration finished.");
     }
 
     fn send_to_bottom(&mut self) {

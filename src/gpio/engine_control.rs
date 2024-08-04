@@ -27,8 +27,6 @@ impl EngineControl {
             },
         };
 
-        println!("Engine control initialized");
-
         instance
     }
 

@@ -47,8 +47,6 @@ impl SSD1306 {
         ssd1306.display.init().unwrap();
         ssd1306.refresh_screen();
 
-        println!("SSD1306 initialized");
-
         ssd1306
     }
 

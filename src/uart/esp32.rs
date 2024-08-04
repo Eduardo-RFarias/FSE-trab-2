@@ -84,8 +84,6 @@ impl Esp32 {
         uart.set_write_mode(true).unwrap();
         uart.set_read_mode(0, Duration::from_millis(100)).unwrap();
 
-        println!("ESP32 initialized in UART mode");
-
         Esp32 { uart }
     }
 

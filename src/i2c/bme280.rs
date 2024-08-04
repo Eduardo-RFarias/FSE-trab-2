@@ -24,8 +24,6 @@ impl BME280 {
     pub fn new() -> Self {
         // If TEMPERATURE_FILE_1 and TEMPERATURE_FILE_2 exist, then the BME280 is connected as kernel module
         if file_exists(TEMPERATURE_FILE_1) && file_exists(TEMPERATURE_FILE_2) {
-            println!("BME280 is connected as kernel module");
-
             Self { sensors: None }
         }
         // If not, then the BME280 is connected as I2C device
@@ -40,8 +38,6 @@ impl BME280 {
 
             bme280_1.init(&mut delay).unwrap();
             bme280_2.init(&mut delay).unwrap();
-
-            println!("BME280 is connected as I2C device");
 
             Self {
                 sensors: Some(I2cSensors {
