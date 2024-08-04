@@ -1,30 +1,52 @@
-use crate::common::Elevator;
-use crate::gpio::elevator_control::{Direction, ElevatorControl};
+use crate::common::{Direction, Elevator};
+use crate::gpio::{engine_control::EngineControl, pid::PidController};
 use std::thread;
 use std::time::Duration;
 
 #[test]
 fn move_elevator() {
     // Arrange
-    let mut gpio = ElevatorControl::new();
+    let mut elevator1 = EngineControl::new(Elevator::One);
+    let mut elevator2 = EngineControl::new(Elevator::Two);
 
     // Act
-    gpio.set_direction(Elevator::One, Direction::Up);
-    gpio.set_potency(Elevator::One, 1.0);
+    elevator1.set_direction(Direction::Up);
+    elevator1.set_potency(1.0);
 
-    gpio.set_direction(Elevator::Two, Direction::Up);
-    gpio.set_potency(Elevator::Two, 0.7);
+    elevator2.set_direction(Direction::Up);
+    elevator2.set_potency(1.0);
 
-    // Assert
-    // No assertion needed, just testing that the function does not panic
+    thread::sleep(Duration::from_secs(1));
 
-    // Wait for the elevator to move
+    elevator1.set_direction(Direction::Down);
+    elevator1.set_potency(1.0);
+
+    elevator2.set_direction(Direction::Down);
+    elevator2.set_potency(1.0);
+
     thread::sleep(Duration::from_secs(1));
 
     // Cleanup
-    gpio.set_direction(Elevator::One, Direction::Idle);
-    gpio.set_potency(Elevator::One, 0.0);
+    elevator1.set_direction(Direction::Stop);
+    elevator1.set_potency(0.0);
 
-    gpio.set_direction(Elevator::Two, Direction::Idle);
-    gpio.set_potency(Elevator::Two, 0.0);
+    elevator2.set_direction(Direction::Stop);
+    elevator2.set_potency(0.0);
+}
+
+#[test]
+fn pid() {
+    // Arrange
+    let mut pid = PidController::new();
+
+    // Act
+    let (potency_1, direction_1) = pid.get_control_signal(0, 25000);
+    let (potency_2, direction_2) = pid.get_control_signal(25000, 0);
+
+    // Assert
+    assert_eq!(potency_1, 1.0);
+    assert_eq!(direction_1, Direction::Up);
+
+    assert_eq!(potency_2, 1.0);
+    assert_eq!(direction_2, Direction::Down);
 }

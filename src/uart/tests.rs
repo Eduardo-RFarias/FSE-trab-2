@@ -15,19 +15,6 @@ fn get_encoder_value() {
 }
 
 #[test]
-fn send_pwm() {
-    // Arrange
-    let mut uart = Esp32::new();
-
-    // Act
-    uart.send_pwm(Encoder::One, 50);
-    uart.send_pwm(Encoder::Two, 40);
-
-    // Assert
-    // No assertion needed, just testing that the function does not panic
-}
-
-#[test]
 fn send_temp() {
     // Arrange
     let mut uart = Esp32::new();
@@ -35,6 +22,19 @@ fn send_temp() {
     // Act
     uart.send_temp(Elevator::One, 37.0);
     uart.send_temp(Elevator::Two, 35.0);
+
+    // Assert
+    // No assertion needed, just testing that the function does not panic
+}
+
+#[test]
+fn send_control_signal() {
+    // Arrange
+    let mut uart = Esp32::new();
+
+    // Act
+    uart.send_control_signal(Encoder::One, 50);
+    uart.send_control_signal(Encoder::Two, 40);
 
     // Assert
     // No assertion needed, just testing that the function does not panic

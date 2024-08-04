@@ -62,7 +62,7 @@ impl BME280 {
             .measure(&mut sensors.delay)
             .unwrap()
             .temperature
-            .floor(),
+            .round(),
             None => read_to_string(match elevator {
                 Elevator::One => TEMPERATURE_FILE_1,
                 Elevator::Two => TEMPERATURE_FILE_2,
@@ -72,7 +72,7 @@ impl BME280 {
             .parse()
             .map(|temp: f32| (temp + 5.0) / 1000.0)
             .unwrap()
-            .floor(),
+            .round(),
         }
     }
 }

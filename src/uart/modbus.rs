@@ -2,7 +2,7 @@ use crate::uart::crc;
 
 const SOURCE_ADDRESS: u8 = 0x00;
 const TARGET_ADDRESS: u8 = 0x01;
-const REGISTER_CODE: [u8; 4] = [0, 0, 8, 6];
+const REGISTER_CODE: [u8; 4] = [6, 5, 2, 1];
 
 #[derive(Clone, Copy)]
 pub struct ModbusOperation {
