@@ -112,6 +112,7 @@ impl SSD1306 {
             Floor::First => "1",
             Floor::Second => "2",
             Floor::Third => "3",
+            Floor::Undefined => "?",
         };
 
         let text_2 = match self.elevator_2.floor {
@@ -119,6 +120,7 @@ impl SSD1306 {
             Floor::First => "1",
             Floor::Second => "2",
             Floor::Third => "3",
+            Floor::Undefined => "?",
         };
 
         // The floor is written on the center right of the respective elevator with a 10px padding

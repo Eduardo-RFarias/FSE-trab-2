@@ -1,8 +1,11 @@
-use common::{Elevator, Floor};
-use elevator_control::ElevatorControl;
+use elevator::elevator_control::ElevatorControl;
+use signal_hook::{
+    consts::{SIGINT, SIGTERM},
+    iterator::Signals,
+};
 
 mod common;
-mod elevator_control;
+mod elevator;
 mod gpio;
 mod i2c;
 mod uart;
@@ -12,8 +15,21 @@ fn main() {
 
     elevator.init();
 
-    elevator.move_to(Elevator::One, Floor::Second);
-    elevator.move_to(Elevator::Two, Floor::Third);
-    elevator.move_to(Elevator::One, Floor::Ground);
-    elevator.move_to(Elevator::Two, Floor::First);
+    println!("Elevator is ready.");
+    println!("Press Ctrl+C to stop (or send SIGINT/SIGTERM but not SIGKILL).");
+
+    let mut signals = Signals::new([SIGINT, SIGTERM]).unwrap();
+
+    for signal in signals.forever() {
+        let signal = match signal {
+            SIGINT => "SIGINT",
+            SIGTERM => "SIGTERM",
+            _ => unreachable!(),
+        };
+
+        println!("Received {}, shutting down...", signal);
+        elevator.stop();
+
+        break;
+    }
 }

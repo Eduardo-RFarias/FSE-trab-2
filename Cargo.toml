@@ -9,4 +9,6 @@ edition = "2021"
 bme280 = "0.5.1"
 embedded-graphics = "0.8.1"
 rppal = { version = "0.18.0", features = ["hal"] }
+signal-hook = "0.3.17"
 ssd1306 = "0.8.4"
+stoppable_thread = "0.2.1"

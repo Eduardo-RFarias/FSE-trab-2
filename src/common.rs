@@ -11,6 +11,7 @@ pub enum Floor {
     First,
     Second,
     Third,
+    Undefined,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

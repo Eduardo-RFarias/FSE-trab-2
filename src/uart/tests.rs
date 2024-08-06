@@ -94,25 +94,6 @@ fn read_buttons_in_range() {
 }
 
 #[test]
-fn read_button() {
-    // Arrange
-    let mut uart = Esp32::new();
-
-    uart.write_all_buttons(Elevator::One, &[false; 11]);
-    uart.write_all_buttons(Elevator::Two, &[false; 11]);
-
-    uart.write_button(Elevator::One, Button::GroundFloorUp1, true);
-
-    // Act
-    let button_state = uart.read_button(Elevator::One, Button::GroundFloorUp1);
-    let button_state2 = uart.read_button(Elevator::Two, Button::Emergency2);
-
-    // Assert
-    assert_eq!(button_state, true);
-    assert_eq!(button_state2, false);
-}
-
-#[test]
 fn write_button() {
     // Arrange
     let mut uart = Esp32::new();
@@ -125,8 +106,17 @@ fn write_button() {
     uart.write_button(Elevator::Two, Button::GroundFloorCall2, true);
 
     // Assert
-    let button_state = uart.read_button(Elevator::One, Button::GroundFloorCall1);
-    let button_state2 = uart.read_button(Elevator::Two, Button::GroundFloorCall2);
+    let button_state = uart.read_buttons_in_range(
+        Elevator::One,
+        Button::GroundFloorCall1,
+        Button::GroundFloorCall1,
+    )[&Button::GroundFloorCall1];
+
+    let button_state2 = uart.read_buttons_in_range(
+        Elevator::Two,
+        Button::GroundFloorCall2,
+        Button::GroundFloorCall2,
+    )[&Button::GroundFloorCall2];
 
     assert_eq!(button_state, true);
     assert_eq!(button_state2, true);

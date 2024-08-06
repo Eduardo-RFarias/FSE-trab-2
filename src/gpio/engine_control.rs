@@ -1,9 +1,6 @@
 use crate::common::{Direction, Elevator};
 use rppal::gpio::{Gpio, OutputPin};
 
-pub const LOWEST_POINT: i32 = 0;
-pub const HIGHEST_POINT: i32 = 25500;
-
 pub struct EngineControl {
     dir1_pin: OutputPin,
     dir2_pin: OutputPin,

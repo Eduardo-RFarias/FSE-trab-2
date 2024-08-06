@@ -1,4 +1,4 @@
-use crate::common::Elevator;
+use crate::common::{Elevator, Floor};
 use crate::uart::modbus::{
     create_modbus, read_modbus, READ_ENCODER, READ_REGISTERS, SEND_PWM, SEND_TEMP, WRITE_REGISTERS,
 };
@@ -42,6 +42,74 @@ pub enum Button {
     ThirdFloorCall2 = 0xAA,
 }
 
+impl Button {
+    pub fn into_floor(self, elevator: Elevator) -> Option<Floor> {
+        match elevator {
+            Elevator::One => match self {
+                Button::GroundFloorUp1 => Some(Floor::Ground),
+                Button::FirstFloorUp1 => Some(Floor::First),
+                Button::FirstFloorDown1 => Some(Floor::First),
+                Button::SecondFloorUp1 => Some(Floor::Second),
+                Button::SecondFloorDown1 => Some(Floor::Second),
+                Button::ThirdFloorDown1 => Some(Floor::Third),
+                Button::GroundFloorCall1 => Some(Floor::Ground),
+                Button::FirstFloorCall1 => Some(Floor::First),
+                Button::SecondFloorCall1 => Some(Floor::Second),
+                Button::ThirdFloorCall1 => Some(Floor::Third),
+                _ => None,
+            },
+            Elevator::Two => match self {
+                Button::GroundFloorUp2 => Some(Floor::Ground),
+                Button::FirstFloorUp2 => Some(Floor::First),
+                Button::FirstFloorDown2 => Some(Floor::First),
+                Button::SecondFloorUp2 => Some(Floor::Second),
+                Button::SecondFloorDown2 => Some(Floor::Second),
+                Button::ThirdFloorDown2 => Some(Floor::Third),
+                Button::GroundFloorCall2 => Some(Floor::Ground),
+                Button::FirstFloorCall2 => Some(Floor::First),
+                Button::SecondFloorCall2 => Some(Floor::Second),
+                Button::ThirdFloorCall2 => Some(Floor::Third),
+                _ => None,
+            },
+        }
+    }
+
+    pub fn get_buttons(elevator: Elevator, floor: Floor) -> Vec<Button> {
+        match elevator {
+            Elevator::One => match floor {
+                Floor::Ground => vec![Button::GroundFloorUp1, Button::GroundFloorCall1],
+                Floor::First => vec![
+                    Button::FirstFloorUp1,
+                    Button::FirstFloorDown1,
+                    Button::FirstFloorCall1,
+                ],
+                Floor::Second => vec![
+                    Button::SecondFloorUp1,
+                    Button::SecondFloorDown1,
+                    Button::SecondFloorCall1,
+                ],
+                Floor::Third => vec![Button::ThirdFloorDown1, Button::ThirdFloorCall1],
+                Floor::Undefined => unreachable!(),
+            },
+            Elevator::Two => match floor {
+                Floor::Ground => vec![Button::GroundFloorUp2, Button::GroundFloorCall2],
+                Floor::First => vec![
+                    Button::FirstFloorUp2,
+                    Button::FirstFloorDown2,
+                    Button::FirstFloorCall2,
+                ],
+                Floor::Second => vec![
+                    Button::SecondFloorUp2,
+                    Button::SecondFloorDown2,
+                    Button::SecondFloorCall2,
+                ],
+                Floor::Third => vec![Button::ThirdFloorDown2, Button::ThirdFloorCall2],
+                Floor::Undefined => unreachable!(),
+            },
+        }
+    }
+}
+
 impl From<u8> for Button {
     fn from(value: u8) -> Self {
         match value {
@@ -68,7 +136,7 @@ impl From<u8> for Button {
             0xA8 => Button::FirstFloorCall2,
             0xA9 => Button::SecondFloorCall2,
             0xAA => Button::ThirdFloorCall2,
-            _ => panic!("Invalid button value: {}", value),
+            _ => panic!("Invalid button value: {:X}", value),
         }
     }
 }
@@ -148,8 +216,8 @@ impl Esp32 {
 
         for current_try in 1..=3 {
             let wrote = self.uart.write(&request).unwrap();
-            let mut read = self.uart.read(&mut response).unwrap();
-            read = self.uart.read(&mut response).unwrap();
+            let read = self.uart.read(&mut response).unwrap();
+            self.uart.read(&mut response).unwrap();
 
             if wrote != request.len() || read != response.len() {
                 eprintln!("({}) Fail to read/write uart:", current_try);
@@ -190,8 +258,8 @@ impl Esp32 {
 
         for current_try in 1..=3 {
             let wrote = self.uart.write(&request).unwrap();
-            let mut read = self.uart.read(&mut response).unwrap();
-            read = self.uart.read(&mut response).unwrap();
+            let read = self.uart.read(&mut response).unwrap();
+            self.uart.read(&mut response).unwrap();
 
             if wrote != request.len() || read != response.len() {
                 eprintln!("({}) Fail to read/write uart:", current_try);
@@ -307,13 +375,6 @@ impl Esp32 {
                 Button::ThirdFloorCall2,
             ),
         }
-    }
-
-    pub fn read_button(&mut self, elevator: Elevator, button: Button) -> bool {
-        *self
-            .read_buttons_in_range(elevator, button, button)
-            .get(&button)
-            .unwrap()
     }
 
     pub fn write_button_in_range(
